@@ -11,6 +11,8 @@ import producer
 
 MAX_ACCEPTABLE_TOTAL_LATENCY_MS = 5000.0
 MAX_ACCEPTABLE_READ_LATENCY_MS = 2000.0
+EFFICIENCY_SAMPLE_SIZE = 5000
+FLOAT_COMPARISON_PLACES = 5
 
 
 class AccuracyEfficiencyTests(unittest.TestCase):
@@ -54,7 +56,7 @@ class AccuracyEfficiencyTests(unittest.TestCase):
 
         self.assertEqual(tensor.shape[0], len(input_data))
         for expected, actual in zip(input_data, tensor.tolist()):
-            self.assertAlmostEqual(actual, expected, places=5)
+            self.assertAlmostEqual(actual, expected, places=FLOAT_COMPARISON_PLACES)
 
         np_view = tensor.numpy()
         self.assertEqual(
@@ -70,7 +72,7 @@ class AccuracyEfficiencyTests(unittest.TestCase):
             reader.read_tensor()
 
     def test_basic_efficiency_signals(self) -> None:
-        input_data = [float(i) for i in range(5000)]
+        input_data = [float(i) for i in range(EFFICIENCY_SAMPLE_SIZE)]
         response = asyncio.run(producer.process(producer.ProcessRequest(data=input_data)))
 
         self.assertGreaterEqual(response.serialization_ms, 0.0)
