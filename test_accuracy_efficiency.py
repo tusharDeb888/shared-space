@@ -85,8 +85,8 @@ class AccuracyEfficiencyTests(unittest.TestCase):
         self.assertGreaterEqual(response.total_ms, 0.0)
         self.assertLess(response.total_ms, MAX_ACCEPTABLE_TOTAL_LATENCY_MS)
 
-        reader = consumer.ArrowMemoryReader(self._shm_path, self._lock_path)
         start = time.perf_counter()
+        reader = consumer.ArrowMemoryReader(self._shm_path, self._lock_path)
         tensor = reader.read_tensor()
         elapsed_ms = (time.perf_counter() - start) * 1000
 
