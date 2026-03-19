@@ -10,23 +10,23 @@ import consumer
 import producer
 
 MAX_ACCEPTABLE_TOTAL_LATENCY_MS = 5000.0
-MAX_ACCEPTABLE_READ_LATENCY_MS = 5000.0
+MAX_ACCEPTABLE_READ_LATENCY_MS = 2000.0
 
 
 class AccuracyEfficiencyTests(unittest.TestCase):
     def setUp(self) -> None:
         self._tmpdir = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmpdir.cleanup)
-        shm_path = os.path.join(self._tmpdir.name, "shared_memory.arrow")
+        self._shm_path = os.path.join(self._tmpdir.name, "shared_memory.arrow")
 
         self._old_producer_paths = (
             producer.SHM_PATH,
             producer.LOCK_PATH,
             producer.READY_PATH,
         )
-        producer.SHM_PATH = shm_path
-        producer.LOCK_PATH = f"{shm_path}.lock"
-        producer.READY_PATH = f"{shm_path}.ready"
+        producer.SHM_PATH = self._shm_path
+        producer.LOCK_PATH = f"{self._shm_path}.lock"
+        producer.READY_PATH = f"{self._shm_path}.ready"
         self.addCleanup(self._restore_producer_paths)
 
     def _restore_producer_paths(self) -> None:
@@ -59,7 +59,7 @@ class AccuracyEfficiencyTests(unittest.TestCase):
         np_view = tensor.numpy()
         self.assertEqual(
             tensor.data_ptr(),
-            np_view.__array_interface__["data"][0],
+            np_view.ctypes.data,
             "Tensor and NumPy view should share the same backing memory address",
         )
 
