@@ -9,10 +9,14 @@ from fastapi import HTTPException
 import consumer
 import producer
 
+MAX_ACCEPTABLE_TOTAL_LATENCY_MS = 5000.0
+MAX_ACCEPTABLE_READ_LATENCY_MS = 5000.0
+
 
 class AccuracyEfficiencyTests(unittest.TestCase):
     def setUp(self) -> None:
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         shm_path = os.path.join(self._tmpdir.name, "shared_memory.arrow")
 
         self._old_producer_paths = (
@@ -23,10 +27,13 @@ class AccuracyEfficiencyTests(unittest.TestCase):
         producer.SHM_PATH = shm_path
         producer.LOCK_PATH = f"{shm_path}.lock"
         producer.READY_PATH = f"{shm_path}.ready"
+        self.addCleanup(self._restore_producer_paths)
 
-    def tearDown(self) -> None:
-        producer.SHM_PATH, producer.LOCK_PATH, producer.READY_PATH = self._old_producer_paths
-        self._tmpdir.cleanup()
+    def _restore_producer_paths(self) -> None:
+        old_shm_path, old_lock_path, old_ready_path = self._old_producer_paths
+        producer.SHM_PATH = old_shm_path
+        producer.LOCK_PATH = old_lock_path
+        producer.READY_PATH = old_ready_path
 
     def test_process_rejects_empty_input(self) -> None:
         with self.assertRaises(HTTPException) as context:
@@ -50,7 +57,17 @@ class AccuracyEfficiencyTests(unittest.TestCase):
             self.assertAlmostEqual(actual, expected, places=5)
 
         np_view = tensor.numpy()
-        self.assertEqual(tensor.data_ptr(), np_view.__array_interface__["data"][0])
+        self.assertEqual(
+            tensor.data_ptr(),
+            np_view.__array_interface__["data"][0],
+            "Tensor and NumPy view should share the same backing memory address",
+        )
+
+    def test_consumer_missing_file_raises(self) -> None:
+        missing_path = os.path.join(self._tmpdir.name, "missing.arrow")
+        reader = consumer.ArrowMemoryReader(missing_path, f"{missing_path}.lock")
+        with self.assertRaises(FileNotFoundError):
+            reader.read_tensor()
 
     def test_basic_efficiency_signals(self) -> None:
         input_data = [float(i) for i in range(5000)]
@@ -59,7 +76,7 @@ class AccuracyEfficiencyTests(unittest.TestCase):
         self.assertGreaterEqual(response.serialization_ms, 0.0)
         self.assertGreaterEqual(response.write_ms, 0.0)
         self.assertGreaterEqual(response.total_ms, 0.0)
-        self.assertLess(response.total_ms, 5000.0)
+        self.assertLess(response.total_ms, MAX_ACCEPTABLE_TOTAL_LATENCY_MS)
 
         reader = consumer.ArrowMemoryReader(producer.SHM_PATH, producer.LOCK_PATH)
         start = time.perf_counter()
@@ -67,7 +84,7 @@ class AccuracyEfficiencyTests(unittest.TestCase):
         elapsed_ms = (time.perf_counter() - start) * 1000
 
         self.assertEqual(tensor.numel(), len(input_data))
-        self.assertLess(elapsed_ms, 5000.0)
+        self.assertLess(elapsed_ms, MAX_ACCEPTABLE_READ_LATENCY_MS)
 
 
 if __name__ == "__main__":
