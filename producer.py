@@ -13,7 +13,6 @@ import os
 import time
 import logging
 
-import numpy as np
 import pyarrow as pa
 import pyarrow.ipc as ipc
 from fastapi import FastAPI, HTTPException
