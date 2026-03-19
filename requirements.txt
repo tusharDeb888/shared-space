@@ -1,0 +1,6 @@
+fastapi>=0.115
+uvicorn>=0.34
+pyarrow>=19.0
+torch>=2.6
+filelock>=3.18
+numpy>=2.2

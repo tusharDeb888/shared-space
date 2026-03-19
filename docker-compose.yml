@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  api_gateway: # Node A (Producer)
+    build: .
+    command: uvicorn producer:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    # This makes the container's memory space shareable
+    ipc: shareable 
+    environment:
+      - SHARED_MEM_PATH=/dev/shm/shared_memory.arrow
+
+  ml_worker: # Node B (Consumer)
+    build: .
+    command: python consumer.py
+    # This attaches the worker directly to the gateway's memory space
+    ipc: service:api_gateway 
+    environment:
+      - SHARED_MEM_PATH=/dev/shm/shared_memory.arrow
+    deploy:
+      resources:
+        reservations:
+          # Optional: Expose GPU to the ML worker if available
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
