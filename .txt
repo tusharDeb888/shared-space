@@ -1,0 +1,4 @@
+cd "/Users/tushardeb/shared memory"
+uvicorn producer:app --port 8000 &
+python consumer.py &
+streamlit run dashboard.py --server.port 8501

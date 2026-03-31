@@ -1,0 +1,373 @@
+/Users/tushardeb/shared memory/consumer.py:255: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+INFO:     Started server process [42974]
+INFO:     Waiting for application startup.
+2026-03-27 23:13:10,300 [CONSUMER] Polling thread started — monitoring /tmp/shared_memory.arrow every 100 ms
+2026-03-27 23:13:10,300 [CONSUMER] Background polling thread launched
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     127.0.0.1:61615 - "GET /health HTTP/1.1" 200 OK
+/Users/tushardeb/shared memory/consumer.py:113: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:219.)
+  tensor = torch.from_numpy(np_array)
+2026-03-27 23:14:14,127 [CONSUMER] ============================================================
+2026-03-27 23:14:14,128 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:14:14,128 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:14:14,129 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:14:14,129 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:14:14,128 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=18.4385ms  convert=773.7717ms  total=792.2102ms
+2026-03-27 23:14:14,135 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:14:14,136 [CONSUMER]   Read latency : 74.9533 ms
+2026-03-27 23:14:14,136 [CONSUMER]   Convert lat. : 705.9762 ms
+2026-03-27 23:14:14,136 [CONSUMER]   Total latency: 780.9295 ms
+2026-03-27 23:14:14,136 [CONSUMER] ============================================================
+2026-03-27 23:14:14,148 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+INFO:     127.0.0.1:61619 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:14:14,578 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=155.5741ms  convert=13.3768ms  total=168.9510ms
+INFO:     127.0.0.1:61623 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:14:14,613 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.6336ms  convert=0.0414ms  total=0.6750ms
+INFO:     127.0.0.1:61627 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:14:14,684 [CONSUMER] ============================================================
+2026-03-27 23:14:14,684 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:14:14,684 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:14:14,684 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:14:14,684 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:14:14,684 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:14:14,684 [CONSUMER]   Read latency : 0.7694 ms
+2026-03-27 23:14:14,684 [CONSUMER]   Convert lat. : 0.0370 ms
+2026-03-27 23:14:14,684 [CONSUMER]   Total latency: 0.8065 ms
+2026-03-27 23:14:14,684 [CONSUMER] ============================================================
+2026-03-27 23:14:14,685 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:14:15,028 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=150.3194ms  convert=13.4090ms  total=163.7283ms
+INFO:     127.0.0.1:61631 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:14:15,062 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.6301ms  convert=0.0399ms  total=0.6700ms
+INFO:     127.0.0.1:61635 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:14:15,131 [CONSUMER] ============================================================
+2026-03-27 23:14:15,131 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:14:15,131 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:14:15,131 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:14:15,131 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:14:15,131 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:14:15,131 [CONSUMER]   Read latency : 0.7507 ms
+2026-03-27 23:14:15,131 [CONSUMER]   Convert lat. : 0.0345 ms
+2026-03-27 23:14:15,131 [CONSUMER]   Total latency: 0.7852 ms
+2026-03-27 23:14:15,131 [CONSUMER] ============================================================
+2026-03-27 23:14:15,131 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:14:15,475 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=149.8366ms  convert=12.9435ms  total=162.7800ms
+INFO:     127.0.0.1:61639 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61647 - "GET /health HTTP/1.1" 200 OK
+2026-03-27 23:15:00,546 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=11.8570ms  convert=10.3945ms  total=22.2515ms
+INFO:     127.0.0.1:61651 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:00,572 [CONSUMER] ============================================================
+2026-03-27 23:15:00,572 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:00,572 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:00,572 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:00,572 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:15:00,576 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:00,576 [CONSUMER]   Read latency : 0.7555 ms
+2026-03-27 23:15:00,576 [CONSUMER]   Convert lat. : 0.0422 ms
+2026-03-27 23:15:00,576 [CONSUMER]   Total latency: 0.7976 ms
+2026-03-27 23:15:00,576 [CONSUMER] ============================================================
+2026-03-27 23:15:00,576 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:00,997 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=162.4992ms  convert=14.7101ms  total=177.2093ms
+INFO:     127.0.0.1:61655 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61659 - "GET /health HTTP/1.1" 200 OK
+2026-03-27 23:15:07,795 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=1.0534ms  convert=0.0426ms  total=1.0960ms
+INFO:     127.0.0.1:61663 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:07,862 [CONSUMER] ============================================================
+2026-03-27 23:15:07,862 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:07,862 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:07,862 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:07,862 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:15:07,862 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:07,862 [CONSUMER]   Read latency : 0.7860 ms
+2026-03-27 23:15:07,862 [CONSUMER]   Convert lat. : 0.0405 ms
+2026-03-27 23:15:07,862 [CONSUMER]   Total latency: 0.8265 ms
+2026-03-27 23:15:07,862 [CONSUMER] ============================================================
+2026-03-27 23:15:07,863 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:08,213 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=152.8697ms  convert=13.3530ms  total=166.2227ms
+INFO:     127.0.0.1:61667 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:08,246 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.6227ms  convert=0.0392ms  total=0.6618ms
+INFO:     127.0.0.1:61671 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:08,317 [CONSUMER] ============================================================
+2026-03-27 23:15:08,317 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:08,317 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:08,318 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:08,318 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:15:08,318 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:08,318 [CONSUMER]   Read latency : 0.7789 ms
+2026-03-27 23:15:08,318 [CONSUMER]   Convert lat. : 0.0374 ms
+2026-03-27 23:15:08,318 [CONSUMER]   Total latency: 0.8163 ms
+2026-03-27 23:15:08,318 [CONSUMER] ============================================================
+2026-03-27 23:15:08,318 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:08,657 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=148.5149ms  convert=12.8819ms  total=161.3968ms
+INFO:     127.0.0.1:61675 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:08,691 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.7168ms  convert=0.0407ms  total=0.7575ms
+INFO:     127.0.0.1:61679 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:08,758 [CONSUMER] ============================================================
+2026-03-27 23:15:08,758 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:08,758 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:08,758 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:08,758 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:15:08,758 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:08,758 [CONSUMER]   Read latency : 0.7402 ms
+2026-03-27 23:15:08,759 [CONSUMER]   Convert lat. : 0.0356 ms
+2026-03-27 23:15:08,759 [CONSUMER]   Total latency: 0.7758 ms
+2026-03-27 23:15:08,759 [CONSUMER] ============================================================
+2026-03-27 23:15:08,759 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:09,101 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=148.6355ms  convert=13.3242ms  total=161.9596ms
+INFO:     127.0.0.1:61683 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:09,134 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.6310ms  convert=0.0373ms  total=0.6683ms
+INFO:     127.0.0.1:61687 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:09,207 [CONSUMER] ============================================================
+2026-03-27 23:15:09,207 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:09,207 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:09,207 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:09,207 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:15:09,207 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:09,207 [CONSUMER]   Read latency : 0.8185 ms
+2026-03-27 23:15:09,207 [CONSUMER]   Convert lat. : 0.0426 ms
+2026-03-27 23:15:09,207 [CONSUMER]   Total latency: 0.8611 ms
+2026-03-27 23:15:09,207 [CONSUMER] ============================================================
+2026-03-27 23:15:09,208 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:09,545 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=148.4950ms  convert=13.1543ms  total=161.6494ms
+INFO:     127.0.0.1:61691 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:09,579 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.6938ms  convert=0.0412ms  total=0.7350ms
+INFO:     127.0.0.1:61695 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:09,649 [CONSUMER] ============================================================
+2026-03-27 23:15:09,649 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:09,649 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:09,649 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:09,649 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:15:09,649 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:09,649 [CONSUMER]   Read latency : 0.7872 ms
+2026-03-27 23:15:09,649 [CONSUMER]   Convert lat. : 0.0368 ms
+2026-03-27 23:15:09,649 [CONSUMER]   Total latency: 0.8240 ms
+2026-03-27 23:15:09,649 [CONSUMER] ============================================================
+2026-03-27 23:15:09,649 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:09,989 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=148.5707ms  convert=12.8928ms  total=161.4635ms
+INFO:     127.0.0.1:61699 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61703 - "GET /health HTTP/1.1" 200 OK
+2026-03-27 23:15:17,373 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.8599ms  convert=0.0450ms  total=0.9049ms
+INFO:     127.0.0.1:61707 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:17,422 [CONSUMER] ============================================================
+2026-03-27 23:15:17,422 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:17,422 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:17,422 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:17,422 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:15:17,422 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:17,422 [CONSUMER]   Read latency : 0.8368 ms
+2026-03-27 23:15:17,422 [CONSUMER]   Convert lat. : 0.0387 ms
+2026-03-27 23:15:17,422 [CONSUMER]   Total latency: 0.8755 ms
+2026-03-27 23:15:17,422 [CONSUMER] ============================================================
+2026-03-27 23:15:17,422 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:17,787 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=149.0706ms  convert=13.5118ms  total=162.5824ms
+INFO:     127.0.0.1:61711 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:17,824 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.9905ms  convert=0.0910ms  total=1.0815ms
+INFO:     127.0.0.1:61715 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:17,893 [CONSUMER] ============================================================
+2026-03-27 23:15:17,893 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:17,893 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:17,893 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:17,893 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:15:17,893 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:17,893 [CONSUMER]   Read latency : 0.7623 ms
+2026-03-27 23:15:17,893 [CONSUMER]   Convert lat. : 0.0382 ms
+2026-03-27 23:15:17,893 [CONSUMER]   Total latency: 0.8005 ms
+2026-03-27 23:15:17,893 [CONSUMER] ============================================================
+2026-03-27 23:15:17,893 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:18,235 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=148.8380ms  convert=12.8758ms  total=161.7138ms
+INFO:     127.0.0.1:61719 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:18,269 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.6987ms  convert=0.0415ms  total=0.7403ms
+INFO:     127.0.0.1:61723 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:18,341 [CONSUMER] ============================================================
+2026-03-27 23:15:18,341 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:18,341 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-27 23:15:18,341 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:18,341 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:15:18,341 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:18,341 [CONSUMER]   Read latency : 0.7975 ms
+2026-03-27 23:15:18,341 [CONSUMER]   Convert lat. : 0.0410 ms
+2026-03-27 23:15:18,341 [CONSUMER]   Total latency: 0.8385 ms
+2026-03-27 23:15:18,341 [CONSUMER] ============================================================
+2026-03-27 23:15:18,341 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-27 23:15:18,680 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=149.0566ms  convert=13.1378ms  total=162.1945ms
+INFO:     127.0.0.1:61727 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61731 - "GET /health HTTP/1.1" 200 OK
+2026-03-27 23:15:27,083 [CONSUMER] ARROW CONSUME | shape=torch.Size([310000])  read=1.2404ms  convert=0.0808ms  total=1.3212ms
+INFO:     127.0.0.1:61735 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:27,178 [CONSUMER] ============================================================
+2026-03-27 23:15:27,178 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:27,178 [CONSUMER]   Tensor shape : torch.Size([310000])
+2026-03-27 23:15:27,178 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:27,178 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:15:27,178 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:27,179 [CONSUMER]   Read latency : 0.7242 ms
+2026-03-27 23:15:27,179 [CONSUMER]   Convert lat. : 0.0388 ms
+2026-03-27 23:15:27,179 [CONSUMER]   Total latency: 0.7630 ms
+2026-03-27 23:15:27,179 [CONSUMER] ============================================================
+2026-03-27 23:15:27,179 [CONSUMER] Inference placeholder — tensor sum: 155026.7500
+2026-03-27 23:15:27,362 [CONSUMER] JSON CONSUME  | shape=torch.Size([310000])  deser=100.0256ms  convert=8.3561ms  total=108.3817ms
+INFO:     127.0.0.1:61739 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:27,385 [CONSUMER] ARROW CONSUME | shape=torch.Size([310000])  read=0.5439ms  convert=0.0371ms  total=0.5810ms
+INFO:     127.0.0.1:61743 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:27,467 [CONSUMER] ============================================================
+2026-03-27 23:15:27,467 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:27,467 [CONSUMER]   Tensor shape : torch.Size([310000])
+2026-03-27 23:15:27,467 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:27,467 [CONSUMER]   Data pointer : 0x300050080
+2026-03-27 23:15:27,467 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:27,467 [CONSUMER]   Read latency : 0.6729 ms
+2026-03-27 23:15:27,467 [CONSUMER]   Convert lat. : 0.0382 ms
+2026-03-27 23:15:27,467 [CONSUMER]   Total latency: 0.7110 ms
+2026-03-27 23:15:27,467 [CONSUMER] ============================================================
+2026-03-27 23:15:27,468 [CONSUMER] Inference placeholder — tensor sum: 155026.7500
+2026-03-27 23:15:27,660 [CONSUMER] JSON CONSUME  | shape=torch.Size([310000])  deser=97.7270ms  convert=8.4045ms  total=106.1314ms
+INFO:     127.0.0.1:61747 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-27 23:15:27,683 [CONSUMER] ARROW CONSUME | shape=torch.Size([310000])  read=0.5727ms  convert=0.0361ms  total=0.6088ms
+INFO:     127.0.0.1:61751 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-27 23:15:27,765 [CONSUMER] ============================================================
+2026-03-27 23:15:27,765 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-27 23:15:27,766 [CONSUMER]   Tensor shape : torch.Size([310000])
+2026-03-27 23:15:27,766 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-27 23:15:27,766 [CONSUMER]   Data pointer : 0x300260080
+2026-03-27 23:15:27,766 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-27 23:15:27,766 [CONSUMER]   Read latency : 0.7033 ms
+2026-03-27 23:15:27,766 [CONSUMER]   Convert lat. : 0.0385 ms
+2026-03-27 23:15:27,766 [CONSUMER]   Total latency: 0.7418 ms
+2026-03-27 23:15:27,766 [CONSUMER] ============================================================
+2026-03-27 23:15:27,766 [CONSUMER] Inference placeholder — tensor sum: 155026.7500
+2026-03-27 23:15:27,956 [CONSUMER] JSON CONSUME  | shape=torch.Size([310000])  deser=97.7403ms  convert=8.7126ms  total=106.4529ms
+INFO:     127.0.0.1:61755 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65391 - "GET /api/v1/news/portfolio?category=news&sentiment=all&mode=live HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65394 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65397 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65400 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63778 - "GET /health HTTP/1.1" 200 OK
+2026-03-31 00:16:23,050 [CONSUMER] ARROW CONSUME | shape=torch.Size([100000])  read=51.8134ms  convert=20.4590ms  total=72.2724ms
+2026-03-31 00:16:23,057 [CONSUMER] ============================================================
+2026-03-31 00:16:23,057 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:16:23,057 [CONSUMER]   Tensor shape : torch.Size([100000])
+2026-03-31 00:16:23,058 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:16:23,059 [CONSUMER]   Data pointer : 0x3000c0080
+2026-03-31 00:16:23,064 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:16:23,065 [CONSUMER]   Read latency : 15.2697 ms
+2026-03-31 00:16:23,065 [CONSUMER]   Convert lat. : 0.3317 ms
+2026-03-31 00:16:23,065 [CONSUMER]   Total latency: 15.6015 ms
+2026-03-31 00:16:23,065 [CONSUMER] ============================================================
+2026-03-31 00:16:23,081 [CONSUMER] Inference placeholder — tensor sum: 50062.4922
+INFO:     127.0.0.1:63783 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:16:23,204 [CONSUMER] JSON CONSUME  | shape=torch.Size([100000])  deser=55.9188ms  convert=3.7926ms  total=59.7115ms
+INFO:     127.0.0.1:63787 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63791 - "GET /health HTTP/1.1" 200 OK
+2026-03-31 00:16:33,653 [CONSUMER] ARROW CONSUME | shape=torch.Size([100000])  read=7.0979ms  convert=0.8526ms  total=7.9505ms
+INFO:     127.0.0.1:63795 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:16:33,663 [CONSUMER] ============================================================
+2026-03-31 00:16:33,663 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:16:33,663 [CONSUMER]   Tensor shape : torch.Size([100000])
+2026-03-31 00:16:33,663 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:16:33,663 [CONSUMER]   Data pointer : 0x300050080
+2026-03-31 00:16:33,663 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:16:33,663 [CONSUMER]   Read latency : 1.0246 ms
+2026-03-31 00:16:33,664 [CONSUMER]   Convert lat. : 0.0612 ms
+2026-03-31 00:16:33,664 [CONSUMER]   Total latency: 1.0858 ms
+2026-03-31 00:16:33,664 [CONSUMER] ============================================================
+2026-03-31 00:16:33,664 [CONSUMER] Inference placeholder — tensor sum: 50062.4922
+2026-03-31 00:16:33,768 [CONSUMER] JSON CONSUME  | shape=torch.Size([100000])  deser=48.4325ms  convert=2.9614ms  total=51.3939ms
+INFO:     127.0.0.1:63799 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-31 00:16:33,780 [CONSUMER] ARROW CONSUME | shape=torch.Size([100000])  read=0.5382ms  convert=0.0380ms  total=0.5762ms
+INFO:     127.0.0.1:63803 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:16:33,880 [CONSUMER] JSON CONSUME  | shape=torch.Size([100000])  deser=40.7018ms  convert=2.6892ms  total=43.3910ms
+INFO:     127.0.0.1:63807 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-31 00:16:33,882 [CONSUMER] ============================================================
+2026-03-31 00:16:33,882 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:16:33,882 [CONSUMER]   Tensor shape : torch.Size([100000])
+2026-03-31 00:16:33,882 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:16:33,882 [CONSUMER]   Data pointer : 0x3000c0080
+2026-03-31 00:16:33,882 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:16:33,882 [CONSUMER]   Read latency : 1.6837 ms
+2026-03-31 00:16:33,882 [CONSUMER]   Convert lat. : 0.0347 ms
+2026-03-31 00:16:33,882 [CONSUMER]   Total latency: 1.7184 ms
+2026-03-31 00:16:33,882 [CONSUMER] ============================================================
+2026-03-31 00:16:33,883 [CONSUMER] Inference placeholder — tensor sum: 50062.4922
+2026-03-31 00:16:33,892 [CONSUMER] ARROW CONSUME | shape=torch.Size([100000])  read=0.4172ms  convert=0.0263ms  total=0.4435ms
+INFO:     127.0.0.1:63811 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:16:33,986 [CONSUMER] JSON CONSUME  | shape=torch.Size([100000])  deser=33.8048ms  convert=2.6741ms  total=36.4789ms
+INFO:     127.0.0.1:63815 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-31 00:16:33,988 [CONSUMER] ============================================================
+2026-03-31 00:16:33,988 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:16:33,988 [CONSUMER]   Tensor shape : torch.Size([100000])
+2026-03-31 00:16:33,988 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:16:33,988 [CONSUMER]   Data pointer : 0x300050080
+2026-03-31 00:16:33,988 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:16:33,988 [CONSUMER]   Read latency : 0.6279 ms
+2026-03-31 00:16:33,988 [CONSUMER]   Convert lat. : 0.0385 ms
+2026-03-31 00:16:33,988 [CONSUMER]   Total latency: 0.6664 ms
+2026-03-31 00:16:33,988 [CONSUMER] ============================================================
+2026-03-31 00:16:33,988 [CONSUMER] Inference placeholder — tensor sum: 50062.4922
+INFO:     127.0.0.1:63891 - "GET /health HTTP/1.1" 200 OK
+2026-03-31 00:34:31,914 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=29.1154ms  convert=12.8005ms  total=41.9159ms
+INFO:     127.0.0.1:63895 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:34:31,938 [CONSUMER] ============================================================
+2026-03-31 00:34:31,938 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:34:31,938 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-31 00:34:31,938 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:34:31,938 [CONSUMER]   Data pointer : 0x300260080
+2026-03-31 00:34:31,942 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:34:31,942 [CONSUMER]   Read latency : 57.9366 ms
+2026-03-31 00:34:31,942 [CONSUMER]   Convert lat. : 0.0492 ms
+2026-03-31 00:34:31,942 [CONSUMER]   Total latency: 57.9858 ms
+2026-03-31 00:34:31,942 [CONSUMER] ============================================================
+2026-03-31 00:34:31,942 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-31 00:34:32,398 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=188.7640ms  convert=16.1898ms  total=204.9538ms
+INFO:     127.0.0.1:63899 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-31 00:34:32,455 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=9.2845ms  convert=0.1212ms  total=9.4057ms
+INFO:     127.0.0.1:63903 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:34:32,504 [CONSUMER] ============================================================
+2026-03-31 00:34:32,504 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:34:32,504 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-31 00:34:32,504 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:34:32,504 [CONSUMER]   Data pointer : 0x300050080
+2026-03-31 00:34:32,504 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:34:32,504 [CONSUMER]   Read latency : 1.0192 ms
+2026-03-31 00:34:32,504 [CONSUMER]   Convert lat. : 0.0448 ms
+2026-03-31 00:34:32,504 [CONSUMER]   Total latency: 1.0640 ms
+2026-03-31 00:34:32,504 [CONSUMER] ============================================================
+2026-03-31 00:34:32,504 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-31 00:34:32,912 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=176.1361ms  convert=12.8713ms  total=189.0074ms
+INFO:     127.0.0.1:63907 - "POST /consume_json HTTP/1.1" 200 OK
+2026-03-31 00:34:32,950 [CONSUMER] ARROW CONSUME | shape=torch.Size([470000])  read=0.7915ms  convert=0.0435ms  total=0.8351ms
+INFO:     127.0.0.1:63911 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 00:34:33,018 [CONSUMER] ============================================================
+2026-03-31 00:34:33,018 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 00:34:33,018 [CONSUMER]   Tensor shape : torch.Size([470000])
+2026-03-31 00:34:33,018 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 00:34:33,018 [CONSUMER]   Data pointer : 0x300260080
+2026-03-31 00:34:33,018 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 00:34:33,018 [CONSUMER]   Read latency : 0.8279 ms
+2026-03-31 00:34:33,018 [CONSUMER]   Convert lat. : 0.0435 ms
+2026-03-31 00:34:33,018 [CONSUMER]   Total latency: 0.8714 ms
+2026-03-31 00:34:33,018 [CONSUMER] ============================================================
+2026-03-31 00:34:33,018 [CONSUMER] Inference placeholder — tensor sum: 234740.6406
+2026-03-31 00:34:33,406 [CONSUMER] JSON CONSUME  | shape=torch.Size([470000])  deser=173.0502ms  convert=13.2717ms  total=186.3219ms
+INFO:     127.0.0.1:63915 - "POST /consume_json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64009 - "GET /health HTTP/1.1" 200 OK
+2026-03-31 01:13:27,731 [CONSUMER] ARROW CONSUME | shape=torch.Size([100000])  read=17.4576ms  convert=10.1338ms  total=27.5914ms
+INFO:     127.0.0.1:64013 - "POST /consume_arrow HTTP/1.1" 200 OK
+2026-03-31 01:13:27,796 [CONSUMER] ============================================================
+2026-03-31 01:13:27,796 [CONSUMER] TENSOR RECEIVED — ZERO-COPY VERIFIED
+2026-03-31 01:13:27,796 [CONSUMER]   Tensor shape : torch.Size([100000])
+2026-03-31 01:13:27,796 [CONSUMER]   Tensor dtype : torch.float32
+2026-03-31 01:13:27,796 [CONSUMER]   Data pointer : 0x300050080
+2026-03-31 01:13:27,798 [CONSUMER]   First 5 vals : [0.7739560604095459, 0.43887844681739807, 0.8585979342460632, 0.6973680257797241, 0.09417735040187836]
+2026-03-31 01:13:27,798 [CONSUMER]   Read latency : 0.5325 ms
+2026-03-31 01:13:27,798 [CONSUMER]   Convert lat. : 0.0394 ms
+2026-03-31 01:13:27,798 [CONSUMER]   Total latency: 0.5719 ms
+2026-03-31 01:13:27,798 [CONSUMER] ============================================================
+2026-03-31 01:13:27,799 [CONSUMER] Inference placeholder — tensor sum: 50062.4922
+2026-03-31 01:13:27,844 [CONSUMER] JSON CONSUME  | shape=torch.Size([100000])  deser=34.2637ms  convert=3.7777ms  total=38.0413ms
+INFO:     127.0.0.1:64017 - "POST /consume_json HTTP/1.1" 200 OK

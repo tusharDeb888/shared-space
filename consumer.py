@@ -1,31 +1,38 @@
 """
-consumer.py — Node B (PyTorch Consumer)
+consumer.py — Node B (PyTorch Consumer + FastAPI Server)
 
-Monitors the POSIX shared memory file for new Arrow IPC data written by the
-producer.  Reads the RecordBatch, enforces zero-copy conversion to a PyTorch
-tensor, and prints shape / memory address / latency.
+Dual-mode consumer:
+  1. Background polling thread: monitors POSIX shared memory for Arrow IPC data
+     written by the producer (original behavior).
+  2. FastAPI server (port 8001): exposes /consume_arrow and /consume_json
+     endpoints for benchmark orchestration from the producer/dashboard.
 
-Zero-copy chain:
+Zero-copy chain (Arrow path):
     pa.Column → .to_numpy(zero_copy_only=True) → torch.from_numpy()
 
-Concurrency: filelock.FileLock wraps the read region.
-Signaling:   Polls for the .ready sentinel file created by the producer.
+Traditional chain (JSON path):
+    json.loads() → list → np.array(copy) → torch.from_numpy()
 """
 
+import json
 import os
 import sys
 import time
 import logging
+import threading
 
+import numpy as np
 import pyarrow as pa
 import pyarrow.ipc as ipc
 import torch
+from fastapi import FastAPI, Request, HTTPException
 from filelock import FileLock
+from pydantic import BaseModel
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-SHM_PATH: str = os.getenv("SHARED_MEM_PATH", "/dev/shm/shared_memory.arrow")
+SHM_PATH: str = os.getenv("SHARED_MEM_PATH", "/tmp/shared_memory.arrow")
 LOCK_PATH: str = f"{SHM_PATH}.lock"
 READY_PATH: str = f"{SHM_PATH}.ready"
 POLL_INTERVAL_S: float = 0.1  # 100 ms
@@ -39,7 +46,26 @@ log = logging.getLogger("consumer")
 
 
 # ---------------------------------------------------------------------------
-# Core: read Arrow IPC → zero-copy → PyTorch tensor
+# Response models
+# ---------------------------------------------------------------------------
+class ArrowConsumeResponse(BaseModel):
+    read_ms: float
+    convert_ms: float
+    total_ms: float
+    tensor_shape: list[int]
+    tensor_sum: float
+
+
+class JsonConsumeResponse(BaseModel):
+    deserialize_ms: float
+    convert_ms: float
+    total_ms: float
+    tensor_shape: list[int]
+    tensor_sum: float
+
+
+# ---------------------------------------------------------------------------
+# Core: Arrow IPC → zero-copy → PyTorch tensor
 # ---------------------------------------------------------------------------
 class ArrowMemoryReader:
     """Reads an Arrow IPC stream from a memory-mapped file and produces a
@@ -49,16 +75,13 @@ class ArrowMemoryReader:
         self._shm_path = shm_path
         self._lock = FileLock(lock_path)
 
-    def read_tensor(self) -> torch.Tensor:
+    def read_tensor(self) -> tuple[torch.Tensor, float, float, float]:
         """Read the shared-memory Arrow file under lock and return a
-        zero-copy float32 tensor.
+        zero-copy float32 tensor plus timing breakdown.
 
-        Raises
-        ------
-        FileNotFoundError
-            If the shared-memory file does not exist yet.
-        pa.ArrowInvalid
-            If zero-copy conversion fails (schema mismatch).
+        Returns
+        -------
+        (tensor, read_ms, convert_ms, total_ms)
         """
         t_start = time.perf_counter()
 
@@ -95,49 +118,128 @@ class ArrowMemoryReader:
         convert_ms = (t_end - t_read) * 1000
         total_ms = (t_end - t_start) * 1000
 
-        log.info("=" * 60)
-        log.info("TENSOR RECEIVED — ZERO-COPY VERIFIED")
-        log.info("  Tensor shape : %s", tensor.shape)
-        log.info("  Tensor dtype : %s", tensor.dtype)
-        log.info("  Data pointer : 0x%x", tensor.data_ptr())
-        log.info("  First 5 vals : %s", tensor[:5].tolist())
-        log.info("  Read latency : %.4f ms", read_ms)
-        log.info("  Convert lat. : %.4f ms", convert_ms)
-        log.info("  Total latency: %.4f ms", total_ms)
-        log.info("=" * 60)
-
-        return tensor
+        return tensor, read_ms, convert_ms, total_ms
 
 
 # ---------------------------------------------------------------------------
-# Main polling loop
+# FastAPI app (port 8001)
 # ---------------------------------------------------------------------------
-def main() -> None:
-    log.info("Consumer started — polling %s every %.0f ms",
+app = FastAPI(title="Zero-Copy Consumer", version="2.0.0")
+arrow_reader = ArrowMemoryReader(SHM_PATH, LOCK_PATH)
+
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+
+@app.post("/consume_arrow", response_model=ArrowConsumeResponse)
+async def consume_arrow():
+    """Read the Arrow IPC shared-memory file and return timing metrics."""
+    try:
+        tensor, read_ms, convert_ms, total_ms = arrow_reader.read_tensor()
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Shared memory file not found")
+    except pa.ArrowInvalid as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"ZERO-COPY FAILED — architecture violation: {exc}",
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    log.info(
+        "ARROW CONSUME | shape=%s  read=%.4fms  convert=%.4fms  total=%.4fms",
+        tensor.shape, read_ms, convert_ms, total_ms,
+    )
+
+    return ArrowConsumeResponse(
+        read_ms=round(read_ms, 4),
+        convert_ms=round(convert_ms, 4),
+        total_ms=round(total_ms, 4),
+        tensor_shape=list(tensor.shape),
+        tensor_sum=round(tensor.sum().item(), 4),
+    )
+
+
+@app.post("/consume_json", response_model=JsonConsumeResponse)
+async def consume_json(request: Request):
+    """Accept raw JSON body, deserialize with json.loads(), convert to tensor.
+    Intentionally performs full memory copy to simulate the traditional pipeline.
+    """
+    t_start = time.perf_counter()
+
+    # -----------------------------------------------------------------------
+    # 1. Deserialize: raw bytes → json.loads() → Python list
+    # -----------------------------------------------------------------------
+    raw_body = await request.body()
+    parsed = json.loads(raw_body)
+    float_list = parsed.get("data", [])
+
+    if not float_list:
+        raise HTTPException(status_code=400, detail="data array must not be empty")
+
+    t_deserialized = time.perf_counter()
+
+    # -----------------------------------------------------------------------
+    # 2. Convert: list → NumPy (full copy) → PyTorch tensor
+    # -----------------------------------------------------------------------
+    np_array = np.array(float_list, dtype=np.float32)  # full heap copy
+    tensor = torch.from_numpy(np_array)
+
+    t_end = time.perf_counter()
+
+    deserialize_ms = (t_deserialized - t_start) * 1000
+    convert_ms = (t_end - t_deserialized) * 1000
+    total_ms = (t_end - t_start) * 1000
+
+    log.info(
+        "JSON CONSUME  | shape=%s  deser=%.4fms  convert=%.4fms  total=%.4fms",
+        tensor.shape, deserialize_ms, convert_ms, total_ms,
+    )
+
+    return JsonConsumeResponse(
+        deserialize_ms=round(deserialize_ms, 4),
+        convert_ms=round(convert_ms, 4),
+        total_ms=round(total_ms, 4),
+        tensor_shape=list(tensor.shape),
+        tensor_sum=round(tensor.sum().item(), 4),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Background polling thread (preserves original consumer behavior)
+# ---------------------------------------------------------------------------
+def _polling_loop() -> None:
+    log.info("Polling thread started — monitoring %s every %.0f ms",
              SHM_PATH, POLL_INTERVAL_S * 1000)
 
     reader = ArrowMemoryReader(SHM_PATH, LOCK_PATH)
 
     while True:
-        # Wait for the sentinel file that signals new data
         if not os.path.exists(READY_PATH):
             time.sleep(POLL_INTERVAL_S)
             continue
 
         try:
-            tensor = reader.read_tensor()
+            tensor, read_ms, convert_ms, total_ms = reader.read_tensor()
 
-            # ----------------------------------------------------------
-            # Placeholder: run inference here
-            # For now, just confirm the tensor is usable on the device
-            # ----------------------------------------------------------
+            log.info("=" * 60)
+            log.info("TENSOR RECEIVED — ZERO-COPY VERIFIED")
+            log.info("  Tensor shape : %s", tensor.shape)
+            log.info("  Tensor dtype : %s", tensor.dtype)
+            log.info("  Data pointer : 0x%x", tensor.data_ptr())
+            log.info("  First 5 vals : %s", tensor[:5].tolist())
+            log.info("  Read latency : %.4f ms", read_ms)
+            log.info("  Convert lat. : %.4f ms", convert_ms)
+            log.info("  Total latency: %.4f ms", total_ms)
+            log.info("=" * 60)
             log.info("Inference placeholder — tensor sum: %.4f", tensor.sum().item())
 
-            # Remove sentinel so we wait for the next write
             try:
                 os.remove(READY_PATH)
             except FileNotFoundError:
-                pass  # producer may have already cleaned up
+                pass
 
         except FileNotFoundError:
             log.warning("Shared memory file disappeared before read")
@@ -150,5 +252,16 @@ def main() -> None:
             time.sleep(POLL_INTERVAL_S)
 
 
+@app.on_event("startup")
+async def start_polling_thread():
+    thread = threading.Thread(target=_polling_loop, daemon=True)
+    thread.start()
+    log.info("Background polling thread launched")
+
+
+# ---------------------------------------------------------------------------
+# Standalone entry point (for backward compatibility: `python consumer.py`)
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
