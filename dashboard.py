@@ -504,7 +504,7 @@ else:
     lc1, lc2, lc3 = st.columns(3)
     with lc1:
         st.markdown("""
-        ### 🏗️ Traditional Pipeline
+        ### Traditional Pipeline
         ```
         Producer → json.dumps()
                → HTTP POST body
@@ -516,7 +516,7 @@ else:
         """)
     with lc2:
         st.markdown("""
-        ### ⚡ Zero-Copy Pipeline
+        ### Zero-Copy Pipeline
         ```
         Producer → pa.array()
                → Arrow IPC → mmap
@@ -528,14 +528,14 @@ else:
         """)
     with lc3:
         st.markdown("""
-        ### 🎯 How to Use
+        ### How to Use
         1. Set **Payload Size** in the sidebar
         2. Select **Iterations** for averaging
-        3. Click **🚀 Run Benchmark Race**
+        3. Click **Run Benchmark Race**
         4. Watch the results appear live!
 
         *Backend must be running on ports 8000 & 8001.*
         """)
 
     st.markdown("---")
-    st.info("👈 **Configure payload size in the sidebar and click 'Run Benchmark Race' to start.**")
+    st.info("**Configure payload size in the sidebar and click 'Run Benchmark Race' to start.**")

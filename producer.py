@@ -1,15 +1,3 @@
-"""
-producer.py — Node A (FastAPI Producer + Benchmark Orchestrator)
-
-Endpoints:
-  POST /process         — Original: accept float array, write Arrow IPC to shared memory.
-  POST /benchmark_arrow — Self-contained Arrow IPC benchmark (generates data internally).
-  POST /benchmark_json  — Self-contained JSON/REST baseline benchmark.
-  GET  /health          — Health check.
-
-Concurrency: filelock.FileLock wraps the shared-memory write region.
-Signaling:   A .ready sentinel file notifies the background consumer polling thread.
-"""
 
 import json
 import os
@@ -25,9 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from filelock import FileLock
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
+
 SHM_PATH: str = os.getenv("SHARED_MEM_PATH", "/tmp/shared_memory.arrow")
 LOCK_PATH: str = f"{SHM_PATH}.lock"
 READY_PATH: str = f"{SHM_PATH}.ready"
@@ -39,9 +25,7 @@ ARROW_SCHEMA = pa.schema([("values", pa.float32())])
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [PRODUCER] %(message)s")
 log = logging.getLogger("producer")
 
-# ---------------------------------------------------------------------------
-# FastAPI app
-# ---------------------------------------------------------------------------
+
 app = FastAPI(title="Zero-Copy Producer", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
@@ -51,9 +35,7 @@ app.add_middleware(
 )
 
 
-# ---------------------------------------------------------------------------
-# Request / Response models
-# ---------------------------------------------------------------------------
+
 class ProcessRequest(BaseModel):
     data: list[float]
 
@@ -102,9 +84,6 @@ class JsonBenchmarkResponse(BaseModel):
     json_bytes: int
 
 
-# ---------------------------------------------------------------------------
-# Helper: write Arrow batch to shared memory
-# ---------------------------------------------------------------------------
 def _write_arrow_to_shm(data: list[float]) -> tuple[float, float]:
     """Write float array to shared-memory Arrow IPC file.
 
@@ -133,9 +112,6 @@ def _write_arrow_to_shm(data: list[float]) -> tuple[float, float]:
     return (t_ser - t0) * 1000, (t_end - t_ser) * 1000
 
 
-# ---------------------------------------------------------------------------
-# Original endpoint
-# ---------------------------------------------------------------------------
 @app.post("/process", response_model=ProcessResponse)
 async def process(request: ProcessRequest):
     """Accept an array of floats, serialize to Arrow RecordBatch, and write
@@ -163,9 +139,7 @@ async def process(request: ProcessRequest):
     )
 
 
-# ---------------------------------------------------------------------------
-# Benchmark endpoint: Arrow IPC pipeline
-# ---------------------------------------------------------------------------
+
 @app.post("/benchmark_arrow", response_model=ArrowBenchmarkResponse)
 async def benchmark_arrow(req: BenchmarkRequest):
     """Self-contained Arrow IPC benchmark.
@@ -231,9 +205,7 @@ async def benchmark_arrow(req: BenchmarkRequest):
     )
 
 
-# ---------------------------------------------------------------------------
-# Benchmark endpoint: Traditional JSON/REST pipeline
-# ---------------------------------------------------------------------------
+
 @app.post("/benchmark_json", response_model=JsonBenchmarkResponse)
 async def benchmark_json(req: BenchmarkRequest):
     """Self-contained JSON/REST baseline benchmark.
@@ -251,18 +223,13 @@ async def benchmark_json(req: BenchmarkRequest):
     # Generate deterministic test data (same seed as Arrow for fairness)
     data = np.random.default_rng(42).random(req.size, dtype=np.float64).tolist()
 
-    # -----------------------------------------------------------------------
-    # 1. JSON serialization (the expensive part we want to measure)
-    # -----------------------------------------------------------------------
     t_ser_start = time.perf_counter()
     json_payload = json.dumps({"data": data})
     json_bytes_payload = json_payload.encode("utf-8")
     t_ser_end = time.perf_counter()
     json_serialize_ms = (t_ser_end - t_ser_start) * 1000
 
-    # -----------------------------------------------------------------------
-    # 2. HTTP transfer to consumer
-    # -----------------------------------------------------------------------
+
     t_transfer_start = time.perf_counter()
     try:
         resp = http_client.post(
@@ -302,9 +269,6 @@ async def benchmark_json(req: BenchmarkRequest):
     )
 
 
-# ---------------------------------------------------------------------------
-# Health
-# ---------------------------------------------------------------------------
 @app.get("/health")
 async def health():
     return {"status": "healthy"}

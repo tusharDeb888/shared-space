@@ -1,18 +1,3 @@
-"""
-consumer.py — Node B (PyTorch Consumer + FastAPI Server)
-
-Dual-mode consumer:
-  1. Background polling thread: monitors POSIX shared memory for Arrow IPC data
-     written by the producer (original behavior).
-  2. FastAPI server (port 8001): exposes /consume_arrow and /consume_json
-     endpoints for benchmark orchestration from the producer/dashboard.
-
-Zero-copy chain (Arrow path):
-    pa.Column → .to_numpy(zero_copy_only=True) → torch.from_numpy()
-
-Traditional chain (JSON path):
-    json.loads() → list → np.array(copy) → torch.from_numpy()
-"""
 
 import json
 import os
@@ -29,9 +14,6 @@ from fastapi import FastAPI, Request, HTTPException
 from filelock import FileLock
 from pydantic import BaseModel
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 SHM_PATH: str = os.getenv("SHARED_MEM_PATH", "/tmp/shared_memory.arrow")
 LOCK_PATH: str = f"{SHM_PATH}.lock"
 READY_PATH: str = f"{SHM_PATH}.ready"
@@ -45,9 +27,6 @@ logging.basicConfig(
 log = logging.getLogger("consumer")
 
 
-# ---------------------------------------------------------------------------
-# Response models
-# ---------------------------------------------------------------------------
 class ArrowConsumeResponse(BaseModel):
     read_ms: float
     convert_ms: float
@@ -64,9 +43,7 @@ class JsonConsumeResponse(BaseModel):
     tensor_sum: float
 
 
-# ---------------------------------------------------------------------------
-# Core: Arrow IPC → zero-copy → PyTorch tensor
-# ---------------------------------------------------------------------------
+
 class ArrowMemoryReader:
     """Reads an Arrow IPC stream from a memory-mapped file and produces a
     zero-copy PyTorch tensor."""
@@ -101,9 +78,6 @@ class ArrowMemoryReader:
 
         t_read = time.perf_counter()
 
-        # ------------------------------------------------------------------
-        # Zero-copy chain: Arrow column → NumPy (zero_copy_only) → PyTorch
-        # ------------------------------------------------------------------
         column: pa.Array = batch.column("values")
 
         # This will raise pa.ArrowInvalid if a copy would be required
@@ -121,9 +95,6 @@ class ArrowMemoryReader:
         return tensor, read_ms, convert_ms, total_ms
 
 
-# ---------------------------------------------------------------------------
-# FastAPI app (port 8001)
-# ---------------------------------------------------------------------------
 app = FastAPI(title="Zero-Copy Consumer", version="2.0.0")
 arrow_reader = ArrowMemoryReader(SHM_PATH, LOCK_PATH)
 
@@ -169,9 +140,7 @@ async def consume_json(request: Request):
     """
     t_start = time.perf_counter()
 
-    # -----------------------------------------------------------------------
-    # 1. Deserialize: raw bytes → json.loads() → Python list
-    # -----------------------------------------------------------------------
+
     raw_body = await request.body()
     parsed = json.loads(raw_body)
     float_list = parsed.get("data", [])
@@ -181,9 +150,7 @@ async def consume_json(request: Request):
 
     t_deserialized = time.perf_counter()
 
-    # -----------------------------------------------------------------------
-    # 2. Convert: list → NumPy (full copy) → PyTorch tensor
-    # -----------------------------------------------------------------------
+
     np_array = np.array(float_list, dtype=np.float32)  # full heap copy
     tensor = torch.from_numpy(np_array)
 
@@ -207,9 +174,7 @@ async def consume_json(request: Request):
     )
 
 
-# ---------------------------------------------------------------------------
-# Background polling thread (preserves original consumer behavior)
-# ---------------------------------------------------------------------------
+
 def _polling_loop() -> None:
     log.info("Polling thread started — monitoring %s every %.0f ms",
              SHM_PATH, POLL_INTERVAL_S * 1000)
@@ -259,9 +224,7 @@ async def start_polling_thread():
     log.info("Background polling thread launched")
 
 
-# ---------------------------------------------------------------------------
-# Standalone entry point (for backward compatibility: `python consumer.py`)
-# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
